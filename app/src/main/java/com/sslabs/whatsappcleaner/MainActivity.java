@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -38,20 +39,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDeleteDatabasesClick(View view) {
-        deleteBackupDatabases();
+        sendBroadcast(new Intent(CleanerReceiver.ACTION_FIRE_CLEANUP));
     }
 
     private void init() {
         Context context = this.getBaseContext();
-        Intent intent = new Intent(context, CleanerIntentService.class);
+        Intent intent = new Intent(CleanerReceiver.ACTION_FIRE_CLEANUP);
         mCleanupPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
     private void scheduleCleanup() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 21);
-        calendar.set(Calendar.MINUTE, 06);
+        calendar.set(Calendar.HOUR_OF_DAY, 19);
+        calendar.set(Calendar.MINUTE, 49);
 
         Context context = getBaseContext();
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

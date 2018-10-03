@@ -7,10 +7,20 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Apagar!"
-        android:onClick="onDeleteDatabasesClick"/>
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/text_enable_clean"
+            android:layout_marginStart="@dimen/textview_margin_left"/>
+        <Switch
+            android:id="@+id/switch_enable_cleanup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/switch_margin_left"/>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

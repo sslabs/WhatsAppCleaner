@@ -45,7 +45,7 @@ public class CleanerReceiver extends BroadcastReceiver {
                 });
                 for (File toDelete : oldBackupDatabases) {
                     Log.d(MainActivity.TAG, "File to delete: " + toDelete.getName());
-//                    toDelete.delete();
+                    toDelete.delete();
                 }
             }
             return null;

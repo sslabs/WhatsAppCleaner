@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Context context = this.getBaseContext();
-        Intent intent = new Intent(CleanerReceiver.ACTION_FIRE_CLEANUP);
+        Intent intent = new Intent(context, CleanerReceiver.class);
         mCleanupPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private void scheduleCleanup() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 11);
-        calendar.set(Calendar.MINUTE, 07);
+        calendar.set(Calendar.HOUR_OF_DAY, 14);
+        calendar.set(Calendar.MINUTE, 43);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mCleanupPendingIntent);
     }

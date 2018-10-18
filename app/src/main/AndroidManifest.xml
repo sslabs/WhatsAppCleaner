@@ -16,10 +16,11 @@
         <activity android:name=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".CleanerReceiver" android:enabled="true" android:process=":remote">
+        <receiver android:name=".CleanerReceiver" android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.sslabs.whatsappcleaner.intent.action.FIRE_CLEANUP" />

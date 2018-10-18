@@ -8,20 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.util.Calendar;
-import java.util.regex.Pattern;
+import java.util.GregorianCalendar;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "sslabs";
@@ -60,16 +54,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Context context = this.getBaseContext();
-        Intent intent = new Intent(context, CleanerReceiver.class);
-        mCleanupPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        Intent intent = new Intent(this, CleanerReceiver.class);
+        intent.setAction(CleanerReceiver.ACTION_FIRE_CLEANUP);
+        mCleanupPendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
 
     private void scheduleCleanup() {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 14);
-        calendar.set(Calendar.MINUTE, 43);
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) + 1);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mCleanupPendingIntent);
     }

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Whatsapp Cleaner</string>
     <string name="text_enable_clean">Cleanup WhatsApp back-up databases</string>
+    <string name="text_not_scheduled_text">Not scheduled yet</string>
+    <string name="text_schedule_time_text">Cleanup scheduled for %1$d:%2$d</string>
+    <string name="text_open_scheduler_picker_button">Choose time</string>
 </resources>

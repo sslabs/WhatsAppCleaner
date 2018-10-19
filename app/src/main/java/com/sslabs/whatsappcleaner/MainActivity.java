@@ -30,7 +30,6 @@ import java.util.GregorianCalendar;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "sslabs";
-//    public static final String SCHEDULE_TIME_KEY = "schedule_time";
     public static final String SCHEDULE_HOUR_KEY = "hour";
     public static final String SCHEDULE_MINUTE_KEY = "minute";
 
@@ -49,15 +48,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
-//        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-//        String scheduled_time = preferences.getString(SCHEDULE_TIME_KEY, null);
-//        TextView scheduledTimeTextView = findViewById(R.id.scheduled_time_textview);
-//        if (scheduled_time != null) {
-//            scheduledTimeTextView.setText(scheduled_time);
-//        } else {
-//            scheduledTimeTextView.setText(getResources().getString(R.string.text_not_scheduled_text));
-//        }
-
         Switch enableCleanupSwitch = findViewById(R.id.switch_enable_cleanup);
         enableCleanupSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -69,12 +59,24 @@ public class MainActivity extends AppCompatActivity {
                 getPackageManager().
                         setComponentEnabledSetting(cn, flag, PackageManager.DONT_KILL_APP);
                 if (isChecked) {
-                    scheduleCleanup();
+                    View scheduleBox = findViewById(R.id.schedule_box);
+                    scheduleBox.setVisibility(View.VISIBLE);
                 } else {
+                    View scheduleBox = findViewById(R.id.schedule_box);
+                    scheduleBox.setVisibility(View.INVISIBLE);
+
+                    TextView scheduleTextView = findViewById(R.id.scheduled_time_textview);
+                    scheduleTextView.setText(R.string.text_not_scheduled_text);
+
                     removeScheduledCleanup();
                 }
             }
         });
+        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        if (preferences.contains(SCHEDULE_HOUR_KEY) && preferences.contains(SCHEDULE_MINUTE_KEY)) {
+            enableCleanupSwitch.setChecked(true);
+            loadScheduleTime();
+        }
 
         Context context = getBaseContext();
         Intent intent = new Intent(this, CleanerReceiver.class);
@@ -88,11 +90,29 @@ public class MainActivity extends AppCompatActivity {
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
-    private void scheduleCleanup() {
+    private void loadScheduleTime() {
+        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        int hour = preferences.getInt(SCHEDULE_HOUR_KEY, -1);
+        int minute = preferences.getInt(SCHEDULE_MINUTE_KEY, -1);
+        if (hour == -1 || minute == -1) {
+            return;
+        }
+
+        View scheduleBox = findViewById(R.id.schedule_box);
+        if (scheduleBox.getVisibility() != View.VISIBLE) {
+            scheduleBox.setVisibility(View.VISIBLE);
+        }
+
+        Resources res = getResources();
+        TextView scheduleTextView = findViewById(R.id.scheduled_time_textview);
+        scheduleTextView.setText(res.getString(R.string.text_schedule_time_text, hour, minute));
+    }
+
+    private void scheduleCleanup(int hour, int minute) {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 5);
-        calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) + 1);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mCleanupPendingIntent);
     }
@@ -132,21 +152,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onTimeSet(TimePicker timePicker, int i, int i1) {
-            FragmentActivity activity = getActivity();
+            MainActivity activity = (MainActivity) getActivity();
             SharedPreferences.Editor editor = activity.getPreferences(Context.MODE_PRIVATE).edit();
             editor.putInt(SCHEDULE_HOUR_KEY, timePicker.getHour());
             editor.putInt(SCHEDULE_MINUTE_KEY, timePicker.getMinute());
             editor.apply();
-
-            View scheduleBox = activity.findViewById(R.id.schedule_box);
-            if (scheduleBox.getVisibility() != View.VISIBLE) {
-                scheduleBox.setVisibility(View.VISIBLE);
-            }
-
-            Resources res = activity.getResources();
-            TextView scheduleTextView = activity.findViewById(R.id.scheduled_time_textview);
-            scheduleTextView.setText(res.getString(R.string.text_schedule_time_text,
-                    timePicker.getHour(), timePicker.getMinute()));
+            activity.loadScheduleTime();
         }
     }
 }

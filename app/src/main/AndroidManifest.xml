@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".CleanerReceiver" android:enabled="true">
+        <receiver android:name=".CleanerReceiver" android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.sslabs.whatsappcleaner.intent.action.FIRE_CLEANUP" />

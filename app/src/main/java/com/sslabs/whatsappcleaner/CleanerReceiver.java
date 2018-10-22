@@ -1,14 +1,18 @@
 package com.sslabs.whatsappcleaner;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
 
 public class CleanerReceiver extends BroadcastReceiver {
@@ -22,11 +26,38 @@ public class CleanerReceiver extends BroadcastReceiver {
         if (intent != null) {
             String action = intent.getAction();
             if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
-                //TODO: post pending intent, if necessary
+                SharedPreferences preferences = context.getSharedPreferences(
+                        MainActivity.SHARED_PREFS_FILE_NAME, Context.MODE_PRIVATE);
+                if (preferences.contains(MainActivity.SCHEDULE_HOUR_KEY) &&
+                        preferences.contains(MainActivity.SCHEDULE_MINUTE_KEY)) {
+                    scheduleCleanup(context, preferences);
+                }
             } else if (ACTION_FIRE_CLEANUP.equals(action)) {
                 new CleanerTask().execute();
             }
         }
+    }
+
+    private void scheduleCleanup(Context context, SharedPreferences preferences) {
+        int hour = preferences.getInt(MainActivity.SCHEDULE_HOUR_KEY, -1);
+        int minute = preferences.getInt(MainActivity.SCHEDULE_MINUTE_KEY, -1);
+
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+
+        Intent intent = new Intent(context, CleanerReceiver.class);
+        intent.setAction(CleanerReceiver.ACTION_FIRE_CLEANUP);
+        PendingIntent cleanupPendingIntent =
+                PendingIntent.getBroadcast(context, 0, intent, 0);
+
+        AlarmManager alarmManager =
+                (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY,
+                cleanupPendingIntent);
     }
 
     static class CleanerTask extends AsyncTask {

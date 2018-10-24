@@ -41,23 +41,7 @@ public class CleanerReceiver extends BroadcastReceiver {
     private void scheduleCleanup(Context context, SharedPreferences preferences) {
         int hour = preferences.getInt(MainActivity.SCHEDULE_HOUR_KEY, -1);
         int minute = preferences.getInt(MainActivity.SCHEDULE_MINUTE_KEY, -1);
-
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-
-        Intent intent = new Intent(context, CleanerReceiver.class);
-        intent.setAction(CleanerReceiver.ACTION_FIRE_CLEANUP);
-        PendingIntent cleanupPendingIntent =
-                PendingIntent.getBroadcast(context, 0, intent, 0);
-
-        AlarmManager alarmManager =
-                (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY,
-                cleanupPendingIntent);
+        Utils.scheduleCleanup(context, hour, minute);
     }
 
     static class CleanerTask extends AsyncTask {

@@ -121,15 +121,7 @@ public class MainActivity extends AppCompatActivity
     private void scheduleCleanup(int hour, int minute) {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, mCleanupPendingIntent);
-    }
-
-    private void removeScheduledCleanup() {
-        removeCleanupSharedPreferences();
-        mAlarmManager.cancel(mCleanupPendingIntent);
+        Utils.scheduleCleanup(getBaseContext(), mCleanupPendingIntent, hour, minute);
     }
 
     private void removeCleanupSharedPreferences() {
@@ -187,7 +179,7 @@ public class MainActivity extends AppCompatActivity
             TextView scheduleTextView = findViewById(R.id.scheduled_time_textview);
             scheduleTextView.setText(R.string.text_not_scheduled_text);
 
-            removeScheduledCleanup();
+            Utils.cancelCleanup(getBaseContext(), mCleanupPendingIntent);
         }
     }
 

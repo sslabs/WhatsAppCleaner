@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="text_enable_clean">Apagar os bancos de dados de back-up do Whatsapp</string>
+    <string name="text_enable_clean">Apagar os back-ups do Whatsapp</string>
     <string name="text_not_scheduled_text">Ainda não agendado</string>
-    <string name="text_schedule_time_text">Os back-ups serão apagados às %1$d:%2$d</string>
+    <string name="text_schedule_time_text">Limpeza agendada para %1$02d:%2$02d</string>
     <string name="text_open_scheduler_picker_button">Mudar a hora</string>
     <string name="storage_permission_denied_forever">Você negou o acesso ao armazenamento permanentemente</string>
     <string name="should_grant_storage_permission_dialog_message">Para funcionar corretamente, o Whatsapp Cleaner precisa acessar o armazenamento do dispositivo. Na próxima vez em que a aplicação requistar, você deve considerar permitir que a aplicação acesse o armazenamento, caso contrário os back-ups não serão apagados</string>

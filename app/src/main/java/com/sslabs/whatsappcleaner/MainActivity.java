@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -28,7 +29,8 @@ import android.widget.TimePicker;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements CompoundButton.OnCheckedChangeListener {
     public static final String TAG = "sslabs";
     public static final String SCHEDULE_HOUR_KEY = "hour";
     public static final String SCHEDULE_MINUTE_KEY = "minute";
@@ -53,48 +55,31 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_STORAGE_PERMISSION_CODE) {
             Switch enableCleanupSwitch = findViewById(R.id.switch_enable_cleanup);
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                enableCleanupSwitch.setChecked(true);
+                onCheckedChanged(enableCleanupSwitch, true);
             } else {
+                enableCleanupSwitch.setOnCheckedChangeListener(null);
                 enableCleanupSwitch.setChecked(false);
+                enableCleanupSwitch.setOnCheckedChangeListener(this);
+                if (!shouldRequestStoragePermissionRationale()) {
+                    // Permission denied forever
+                    View view = findViewById(R.id.coordinator_layout);
+                    final Snackbar snackbar = Snackbar.make(
+                            view,
+                            R.string.storage_permission_denied_forever,
+                            Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                }
             }
         }
     }
 
     private void init() {
         Switch enableCleanupSwitch = findViewById(R.id.switch_enable_cleanup);
-        enableCleanupSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (!checkStoragePermissionGranted()) {
-                    ensurePermissions();
-                    return;
-                }
-
-                ComponentName cn = new ComponentName(getBaseContext(), CleanerReceiver.class);
-                int flag = isChecked ?
-                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-                getPackageManager().
-                        setComponentEnabledSetting(cn, flag, PackageManager.DONT_KILL_APP);
-
-                if (isChecked) {
-                    View scheduleBox = findViewById(R.id.schedule_box);
-                    scheduleBox.setVisibility(View.VISIBLE);
-                } else {
-                    View scheduleBox = findViewById(R.id.schedule_box);
-                    scheduleBox.setVisibility(View.INVISIBLE);
-
-                    TextView scheduleTextView = findViewById(R.id.scheduled_time_textview);
-                    scheduleTextView.setText(R.string.text_not_scheduled_text);
-
-                    removeScheduledCleanup();
-                }
-            }
-        });
-        if (!isScheduled()) {
+        if (isScheduled()) {
             enableCleanupSwitch.setChecked(true);
             loadScheduleTime();
         }
+        enableCleanupSwitch.setOnCheckedChangeListener(this);
 
         Context context = getBaseContext();
         Intent intent = new Intent(context, CleanerReceiver.class);
@@ -160,17 +145,49 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void ensurePermissions() {
+    private void requireStoragePermission() {
+        if (shouldRequestStoragePermissionRationale()) {
+            DialogFragment storagePermissionFragment =
+                    new ShouldGrantStoragePermissionDialog();
+            storagePermissionFragment.show(getSupportFragmentManager(),
+                    "storage_permission_fragment");
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_STORAGE_PERMISSION_CODE);
+        }
+    }
+
+    private boolean shouldRequestStoragePermissionRationale() {
+        return ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (!checkStoragePermissionGranted()) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                DialogFragment newFragment = new ShouldGrantStoragePermissionDialog();
-                newFragment.show(getSupportFragmentManager(), "storage_permission_fragment");
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQUEST_STORAGE_PERMISSION_CODE);
-            }
+            requireStoragePermission();
+            return;
+        }
+
+        ComponentName cn = new ComponentName(getBaseContext(), CleanerReceiver.class);
+        int flag = isChecked ?
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+        getPackageManager().
+                setComponentEnabledSetting(cn, flag, PackageManager.DONT_KILL_APP);
+
+        if (isChecked) {
+            View scheduleBox = findViewById(R.id.schedule_box);
+            scheduleBox.setVisibility(View.VISIBLE);
+        } else {
+            View scheduleBox = findViewById(R.id.schedule_box);
+            scheduleBox.setVisibility(View.INVISIBLE);
+
+            TextView scheduleTextView = findViewById(R.id.scheduled_time_textview);
+            scheduleTextView.setText(R.string.text_not_scheduled_text);
+
+            removeScheduledCleanup();
         }
     }
 

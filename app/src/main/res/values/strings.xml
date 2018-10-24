@@ -4,5 +4,6 @@
     <string name="text_not_scheduled_text">Not scheduled yet</string>
     <string name="text_schedule_time_text">Cleanup scheduled for %1$d:%2$d</string>
     <string name="text_open_scheduler_picker_button">Change time</string>
+    <string name="storage_permission_denied_forever">You have permanently denied access to storage</string>
     <string name="should_grant_storage_permission_dialog_message">Whatsapp Cleaner needs to access the device storage in order to works properly. Next time you be asked for, you should consider grant storage permission, otherwise cleanups will not take place</string>
 </resources>

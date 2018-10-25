@@ -1,7 +1,5 @@
 package com.sslabs.whatsappcleaner;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +9,6 @@ import android.os.Environment;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
 
 public class CleanerReceiver extends BroadcastReceiver {

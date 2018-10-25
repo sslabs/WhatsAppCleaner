@@ -8,3 +8,5 @@ And don't worry, Whatapp Cleaner only deletes the back-ups, you messages will st
 Make sure to grant storage permission when asked for. In adiction, some devices limit auto starts to applications after device boots so you also should allow the Whatsapp Cleaner to auto starts after device boots.
 
 Use it at you own risk. The kid behind this won't be responsible for any data loss.
+
+Distributed under GNU General Public License v3.0, in case there is someone who cares about it.

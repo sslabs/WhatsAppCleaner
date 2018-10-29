@@ -1,15 +1,22 @@
 package com.sslabs.whatsappcleaner;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.regex.Pattern;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class CleanerReceiver extends BroadcastReceiver {
 
@@ -29,7 +36,7 @@ public class CleanerReceiver extends BroadcastReceiver {
                     scheduleCleanup(context, preferences);
                 }
             } else if (ACTION_FIRE_CLEANUP.equals(action)) {
-                new CleanerTask().execute();
+                new CleanerTask(context).execute();
             }
         }
     }
@@ -41,6 +48,11 @@ public class CleanerReceiver extends BroadcastReceiver {
     }
 
     static class CleanerTask extends AsyncTask {
+        Context mContext;
+
+        CleanerTask(Context context) {
+            mContext = context;
+        }
 
         @Override
         protected Object doInBackground(Object[] objects) {
@@ -59,6 +71,23 @@ public class CleanerReceiver extends BroadcastReceiver {
                         toDelete.delete();
                     }
                 }
+
+                Intent intent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://developer.android.com/reference/android/app/Notification.html"));
+                PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+                builder.setSmallIcon(R.mipmap.ic_launcher);
+                builder.setContentIntent(pendingIntent);
+                builder.setAutoCancel(true);
+                builder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher));
+                builder.setContentTitle("BasicNotifications Sample");
+                builder.setContentText("Time to learn about notifications!");
+                builder.setSubText("Tap to view documentation about notifications.");
+                NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(
+                        NOTIFICATION_SERVICE);
+                notificationManager.notify(1, builder.build());
+
+
             }
             return null;
         }

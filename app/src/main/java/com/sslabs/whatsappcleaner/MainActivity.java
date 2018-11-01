@@ -3,6 +3,8 @@ package com.sslabs.whatsappcleaner;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ComponentName;
@@ -12,10 +14,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -86,6 +91,7 @@ public class MainActivity extends AppCompatActivity
         intent.setAction(CleanerReceiver.ACTION_FIRE_CLEANUP);
         mCleanupPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        createNotificationChannel();
     }
 
     public void onOpenScheduleTimePickerClick(View view) {
@@ -180,6 +186,40 @@ public class MainActivity extends AppCompatActivity
             scheduleTextView.setText(R.string.text_not_scheduled_text);
 
             Utils.cancelCleanup(getBaseContext(), mCleanupPendingIntent);
+        }
+    }
+
+    public void onSendNotificationClick(View view) {
+        Context context = getBaseContext();
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context, getString(R.string.channel_id));
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setContentIntent(pendingIntent);
+        builder.setAutoCancel(true);
+        builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
+        builder.setContentTitle("BasicNotifications Sample");
+        builder.setContentText("Time to learn about notifications!");
+        builder.setSubText("Tap to view documentation about notifications.");
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(
+                NOTIFICATION_SERVICE);
+        notificationManager.notify(1, builder.build());
+    }
+
+    public void onCanceltificationClick(View view) {
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String name = getString(R.string.channel_id);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(name, description, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
         }
     }
 

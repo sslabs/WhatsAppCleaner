@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Whatsapp Cleaner</string>
     <string name="text_enable_clean">Apagar os back-ups do Whatsapp</string>
     <string name="text_not_scheduled_text">Ainda não agendado</string>
     <string name="text_schedule_time_text">Limpeza agendada para %1$02d:%2$02d</string>

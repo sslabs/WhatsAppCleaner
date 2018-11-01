@@ -36,7 +36,7 @@ public class CleanerReceiver extends BroadcastReceiver {
                     scheduleCleanup(context, preferences);
                 }
             } else if (ACTION_FIRE_CLEANUP.equals(action)) {
-                new CleanerTask(context).execute();
+                new CleanerTask().execute();
             }
         }
     }
@@ -48,11 +48,6 @@ public class CleanerReceiver extends BroadcastReceiver {
     }
 
     static class CleanerTask extends AsyncTask {
-        Context mContext;
-
-        CleanerTask(Context context) {
-            mContext = context;
-        }
 
         @Override
         protected Object doInBackground(Object[] objects) {
@@ -71,23 +66,6 @@ public class CleanerReceiver extends BroadcastReceiver {
                         toDelete.delete();
                     }
                 }
-
-                Intent intent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://developer.android.com/reference/android/app/Notification.html"));
-                PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
-                builder.setSmallIcon(R.mipmap.ic_launcher);
-                builder.setContentIntent(pendingIntent);
-                builder.setAutoCancel(true);
-                builder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher));
-                builder.setContentTitle("BasicNotifications Sample");
-                builder.setContentText("Time to learn about notifications!");
-                builder.setSubText("Tap to view documentation about notifications.");
-                NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(
-                        NOTIFICATION_SERVICE);
-                notificationManager.notify(1, builder.build());
-
-
             }
             return null;
         }

@@ -6,4 +6,6 @@
     <string name="text_open_scheduler_picker_button">Change time</string>
     <string name="storage_permission_denied_forever">You have permanently denied access to storage</string>
     <string name="should_grant_storage_permission_dialog_message">Whatsapp Cleaner needs to access the device storage in order to works properly. Next time you be asked for, you should consider grant storage permission, otherwise cleanups will not take place</string>
+    <string name="channel_id">whatsapp_cleaner_channel_id</string>
+    <string name="channel_description"></string>
 </resources>

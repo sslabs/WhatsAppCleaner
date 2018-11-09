@@ -7,4 +7,14 @@
     <string name="text_open_scheduler_picker_button">Mudar a hora</string>
     <string name="storage_permission_denied_forever">Você negou o acesso ao armazenamento permanentemente</string>
     <string name="should_grant_storage_permission_dialog_message">Para funcionar corretamente, o Whatsapp Cleaner precisa acessar o armazenamento do dispositivo. Na próxima vez em que a aplicação requistar, você deve considerar permitir que a aplicação acesse o armazenamento, caso contrário os back-ups não serão apagados</string>
+    <string name="channel_id">whatsapp_cleaner_channel_id</string>
+    <string name="channel_name">Geral</string>
+    <string name="notification_cleanup_success_text">Whatsapp cleaner executado às %1$s</string>
+    <string name="notification_cleanup_failed_unmounted">Falou ao limpar os backups: armazenamento não disponível</string>
+    <string name="notification_cleanup_failed_delete">Alguns backups podem não ter sido apagados</string>
+    <string name="notification_cleanup_failed_missing_permission">Você precisa dar permissão de acesso ao armazenamento para apagar os backups</string>
+    <plurals name="files_deleted_info">
+        <item quantity="one">%1$d arquivo de backup apagado, liberando %2$d MB de espaço no armazenamento interno</item>
+        <item quantity="other">%1$d arquivos de backup apagados, liberando %2$d MB de espaço no armazenamento interno</item>
+    </plurals>
 </resources>

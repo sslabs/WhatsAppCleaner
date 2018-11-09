@@ -1,7 +1,6 @@
 package com.sslabs.whatsappcleaner;
 
 import android.Manifest;
-import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -14,14 +13,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
@@ -40,11 +36,10 @@ public class MainActivity extends AppCompatActivity
     public static final String SCHEDULE_HOUR_KEY = "hour";
     public static final String SCHEDULE_MINUTE_KEY = "minute";
     public static final String SHARED_PREFS_FILE_NAME = "cleaner_prefs";
+    public static final String ACTION_ASK_STORAGE_PERMISSION =
+            "com.sslabs.whatsappcleaner.intent.action.ASK_STORAGE_PERMISSION";
 
     private static final int REQUEST_STORAGE_PERMISSION_CODE = 1;
-
-    private AlarmManager mAlarmManager;
-    private PendingIntent mCleanupPendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +50,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected  void onResume() {
+        super.onResume();
+        NotificationManager notificationManager =
+                (NotificationManager) getBaseContext().getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+
+        if (isScheduled() && !Utils.INSTANCE.checkStoragePermissionGranted(getBaseContext())) {
+            Switch enableCleanupSwitch = findViewById(R.id.switch_enable_cleanup);
+            enableCleanupSwitch.setChecked(false);
+
+            Intent intent = getIntent();
+            if (intent != null) {
+                String action = intent.getAction();
+                if (ACTION_ASK_STORAGE_PERMISSION.equals(action)) {
+                    requireStoragePermission();
+                }
+            }
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         if (requestCode == REQUEST_STORAGE_PERMISSION_CODE) {
@@ -62,16 +78,20 @@ public class MainActivity extends AppCompatActivity
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 onCheckedChanged(enableCleanupSwitch, true);
             } else {
-                enableCleanupSwitch.setOnCheckedChangeListener(null);
                 enableCleanupSwitch.setChecked(false);
-                enableCleanupSwitch.setOnCheckedChangeListener(this);
                 if (!shouldRequestStoragePermissionRationale()) {
                     // Permission denied forever
                     View view = findViewById(R.id.coordinator_layout);
                     final Snackbar snackbar = Snackbar.make(
                             view,
                             R.string.storage_permission_denied_forever,
-                            Snackbar.LENGTH_SHORT);
+                            Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            snackbar.dismiss();
+                        }
+                    });
                     snackbar.show();
                 }
             }
@@ -87,10 +107,9 @@ public class MainActivity extends AppCompatActivity
         enableCleanupSwitch.setOnCheckedChangeListener(this);
 
         Context context = getBaseContext();
-        Intent intent = new Intent(context, CleanerReceiver.class);
-        intent.setAction(CleanerReceiver.ACTION_FIRE_CLEANUP);
-        mCleanupPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, CleanerIntentService.class);
+        Utils.INSTANCE.setSchedulePendingIntent(
+                PendingIntent.getService(context, 0, intent, 0));
         createNotificationChannel();
     }
 
@@ -127,7 +146,7 @@ public class MainActivity extends AppCompatActivity
     private void scheduleCleanup(int hour, int minute) {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        Utils.scheduleCleanup(getBaseContext(), mCleanupPendingIntent, hour, minute);
+        Utils.INSTANCE.scheduleCleanup(getBaseContext(), hour, minute);
     }
 
     private void removeCleanupSharedPreferences() {
@@ -135,12 +154,6 @@ public class MainActivity extends AppCompatActivity
                 getSharedPreferences(SHARED_PREFS_FILE_NAME, Context.MODE_PRIVATE).edit();
         editor.clear();
         editor.apply();
-    }
-
-    private boolean checkStoragePermissionGranted() {
-        return ContextCompat.checkSelfPermission(
-                getBaseContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requireStoragePermission() {
@@ -163,7 +176,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (!checkStoragePermissionGranted()) {
+        if (isChecked && !Utils.INSTANCE.checkStoragePermissionGranted(getBaseContext())) {
             requireStoragePermission();
             return;
         }
@@ -185,39 +198,17 @@ public class MainActivity extends AppCompatActivity
             TextView scheduleTextView = findViewById(R.id.scheduled_time_textview);
             scheduleTextView.setText(R.string.text_not_scheduled_text);
 
-            Utils.cancelCleanup(getBaseContext(), mCleanupPendingIntent);
+            removeCleanupSharedPreferences();
+            Utils.INSTANCE.cancelScheduledCleanup(getBaseContext());
         }
-    }
-
-    public void onSendNotificationClick(View view) {
-        Context context = getBaseContext();
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(context, getString(R.string.channel_id));
-        builder.setSmallIcon(R.mipmap.ic_launcher);
-        builder.setContentIntent(pendingIntent);
-        builder.setAutoCancel(true);
-        builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
-        builder.setContentTitle("BasicNotifications Sample");
-        builder.setContentText("Time to learn about notifications!");
-        builder.setSubText("Tap to view documentation about notifications.");
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(
-                NOTIFICATION_SERVICE);
-        notificationManager.notify(1, builder.build());
-    }
-
-    public void onCanceltificationClick(View view) {
     }
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String name = getString(R.string.channel_id);
-            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(name, description, importance);
-            channel.setDescription(description);
+            String id = getString(R.string.channel_id);
+            CharSequence name = getString(R.string.channel_name);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(id, name, importance);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }

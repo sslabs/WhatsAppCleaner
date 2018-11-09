@@ -2,10 +2,18 @@
     <string name="app_name">Whatsapp Cleaner</string>
     <string name="text_enable_clean">Cleanup WhatsApp back-up databases</string>
     <string name="text_not_scheduled_text">Not scheduled yet</string>
-    <string name="text_schedule_time_text">Cleanup scheduled for %1$d:%2$d</string>
+    <string name="text_schedule_time_text">Cleanup scheduled for %1$02d:%2$02d</string>
     <string name="text_open_scheduler_picker_button">Change time</string>
     <string name="storage_permission_denied_forever">You have permanently denied access to storage</string>
     <string name="should_grant_storage_permission_dialog_message">Whatsapp Cleaner needs to access the device storage in order to works properly. Next time you be asked for, you should consider grant storage permission, otherwise cleanups will not take place</string>
     <string name="channel_id">whatsapp_cleaner_channel_id</string>
-    <string name="channel_description"></string>
+    <string name="channel_name">General</string>
+    <string name="notification_cleanup_success_text">Whatsapp cleaner ran at %1$s</string>
+    <string name="notification_cleanup_failed_unmounted">Cleanup failed due to media unmounted</string>
+    <string name="notification_cleanup_failed_delete">Cleanup may had failed to delete some backups</string>
+    <string name="notification_cleanup_failed_missing_permission">You need to grant write storage permission in order to cleanup the backups</string>
+    <plurals name="files_deleted_info">
+        <item quantity="one">Deleted %1$d backup database file releasing %2$d MB from internal storage</item>
+        <item quantity="other">Deleted %1$d backup database files releasing %2$d MB from internal storage</item>
+    </plurals>
 </resources>

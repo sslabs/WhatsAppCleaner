@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -53,30 +52,34 @@ public enum Utils {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public void sendNotification(Context context, String text) {
-        Utils.INSTANCE.sendNotification(context, text, null, android.R.drawable.stat_notify_sdcard);
+    public void sendNotification(Context context, int notificationId, String text) {
+        Utils.INSTANCE.sendNotification(context, notificationId,
+                text, null, android.R.drawable.stat_notify_sdcard);
     }
 
-    public void sendNotification(Context context, String text, String subText) {
-        Utils.INSTANCE.sendNotification(context, text, subText, android.R.drawable.stat_notify_sdcard);
+    public void sendNotification(Context context, int notificationId, String text, String subText) {
+        Utils.INSTANCE.sendNotification(context, notificationId, text,
+                subText, android.R.drawable.stat_notify_sdcard);
     }
 
-    public void sendNotification(Context context, String text, int smallIconID) {
-        Utils.INSTANCE.sendNotification(context, text, null, smallIconID);
+    public void sendNotification(Context context, int notificationId, String text, int smallIconID) {
+        Utils.INSTANCE.sendNotification(context, notificationId, text, null, smallIconID);
     }
 
     public void sendNotification(Context context,
-                                        String text,
-                                        String subText,
-                                        int smallIconID) {
+                                 int notificationId,
+                                 String text,
+                                 String subText,
+                                 int smallIconID) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP |
                 Intent.FLAG_ACTIVITY_NEW_TASK);
-        Utils.INSTANCE.sendNotification(context, intent, text, subText, smallIconID);
+        Utils.INSTANCE.sendNotification(context, notificationId, intent, text, subText, smallIconID);
     }
 
     public void sendNotification(Context context,
+                                 int notificationId,
                                  Intent notificationIntent,
                                  String text,
                                  String subText,
@@ -84,34 +87,25 @@ public enum Utils {
         if (context == null) throw new IllegalArgumentException("context required");
         if (text == null) throw new IllegalArgumentException("text required");
 
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        StatusBarNotification[] allNotifications = notificationManager.getActiveNotifications();
-
-        // get the minimum available integer
-        int minAvailableId = 1;
-        for (StatusBarNotification notification : allNotifications) {
-            if (Utils.INSTANCE.hasId(allNotifications, notification.getId())) minAvailableId++;
-            else break;
-        }
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+        Intent deleteNotificationIntent = new Intent(context, CleanerReceiver.class);
+        deleteNotificationIntent.setAction(CleanerReceiver.ACTION_NOTIFICATION_DISMISSED);
+        PendingIntent deletePendingIntent = PendingIntent.
+                getBroadcast(context, 0, deleteNotificationIntent, 0);
+        PendingIntent contentPendingIntent = PendingIntent.
+                getActivity(context, 0, notificationIntent, 0);
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context, context.getString(R.string.channel_id));
-        builder.setSmallIcon(android.R.drawable.stat_notify_sdcard);
-        builder.setContentIntent(pendingIntent);
-        builder.setAutoCancel(true);
-        builder.setContentTitle(context.getString(R.string.app_name));
-        builder.setContentText(text);
-        builder.setSmallIcon(smallIconID);
+        builder.setSmallIcon(android.R.drawable.stat_notify_sdcard)
+                .setDeleteIntent(deletePendingIntent)
+                .setContentIntent(contentPendingIntent)
+                .setAutoCancel(true)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(text)
+                .setSmallIcon(smallIconID);
         if (subText != null && subText.length() > 0) builder.setSubText(subText);
-        notificationManager.notify(minAvailableId, builder.build());
-    }
 
-    private boolean hasId(StatusBarNotification[] allNotifications, int id) {
-        for (StatusBarNotification notification : allNotifications) {
-            if (notification.getId() == id) return true;
-        }
-        return false;
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(notificationId, builder.build());
     }
 }

@@ -10,7 +10,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
@@ -33,11 +32,6 @@ import java.util.GregorianCalendar;
 public class MainActivity extends AppCompatActivity
         implements CompoundButton.OnCheckedChangeListener {
     public static final String TAG = "sslabs";
-    public static final String SCHEDULE_HOUR_KEY = "hour";
-    public static final String SCHEDULE_MINUTE_KEY = "minute";
-    public static final String SHARED_PREFS_FILE_NAME = "cleaner_prefs";
-    public static final String ACTION_ASK_STORAGE_PERMISSION =
-            "com.sslabs.whatsappcleaner.intent.action.ASK_STORAGE_PERMISSION";
 
     private static final int REQUEST_STORAGE_PERMISSION_CODE = 1;
 
@@ -52,21 +46,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected  void onResume() {
         super.onResume();
+        Context context = getBaseContext();
         NotificationManager notificationManager =
-                (NotificationManager) getBaseContext().getSystemService(NOTIFICATION_SERVICE);
+                (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
+        CleanerSharedPreferences.removeDeletedFileInfo(context);
 
-        if (isScheduled() && !Utils.INSTANCE.checkStoragePermissionGranted(getBaseContext())) {
+        CleanerSharedPreferences.ScheduledTime scheduledTime =
+                CleanerSharedPreferences.getScheduledTime(context);
+        if (scheduledTime != null && !Utils.INSTANCE.checkStoragePermissionGranted(context)) {
             Switch enableCleanupSwitch = findViewById(R.id.switch_enable_cleanup);
             enableCleanupSwitch.setChecked(false);
-
-            Intent intent = getIntent();
-            if (intent != null) {
-                String action = intent.getAction();
-                if (ACTION_ASK_STORAGE_PERMISSION.equals(action)) {
-                    requireStoragePermission();
-                }
-            }
         }
     }
 
@@ -100,7 +90,9 @@ public class MainActivity extends AppCompatActivity
 
     private void init() {
         Switch enableCleanupSwitch = findViewById(R.id.switch_enable_cleanup);
-        if (isScheduled()) {
+        CleanerSharedPreferences.ScheduledTime scheduledTime =
+                CleanerSharedPreferences.getScheduledTime(getBaseContext());
+        if (scheduledTime != null) {
             enableCleanupSwitch.setChecked(true);
             loadScheduleTime();
         }
@@ -119,7 +111,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadScheduleTime() {
-        if (!isScheduled()) {
+        CleanerSharedPreferences.ScheduledTime scheduledTime =
+                CleanerSharedPreferences.getScheduledTime(getBaseContext());
+        if (scheduledTime == null) {
             return;
         }
 
@@ -129,31 +123,15 @@ public class MainActivity extends AppCompatActivity
         }
 
         Resources res = getResources();
-        SharedPreferences preferences =
-                getSharedPreferences(SHARED_PREFS_FILE_NAME, Context.MODE_PRIVATE);
-        int hour = preferences.getInt(SCHEDULE_HOUR_KEY, -1);
-        int minute = preferences.getInt(SCHEDULE_MINUTE_KEY, -1);
         TextView scheduleTextView = findViewById(R.id.scheduled_time_textview);
-        scheduleTextView.setText(res.getString(R.string.text_schedule_time_text, hour, minute));
-    }
-
-    private boolean isScheduled() {
-        SharedPreferences preferences =
-                getSharedPreferences(SHARED_PREFS_FILE_NAME, Context.MODE_PRIVATE);
-        return preferences.contains(SCHEDULE_HOUR_KEY) && preferences.contains(SCHEDULE_MINUTE_KEY);
+        scheduleTextView.setText(res.getString(R.string.text_schedule_time_text,
+                scheduledTime.hour, scheduledTime.minute));
     }
 
     private void scheduleCleanup(int hour, int minute) {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         Utils.INSTANCE.scheduleCleanup(getBaseContext(), hour, minute);
-    }
-
-    private void removeCleanupSharedPreferences() {
-        SharedPreferences.Editor editor =
-                getSharedPreferences(SHARED_PREFS_FILE_NAME, Context.MODE_PRIVATE).edit();
-        editor.clear();
-        editor.apply();
     }
 
     private void requireStoragePermission() {
@@ -198,7 +176,7 @@ public class MainActivity extends AppCompatActivity
             TextView scheduleTextView = findViewById(R.id.scheduled_time_textview);
             scheduleTextView.setText(R.string.text_not_scheduled_text);
 
-            removeCleanupSharedPreferences();
+            CleanerSharedPreferences.removeScheduledTime(getBaseContext());
             Utils.INSTANCE.cancelScheduledCleanup(getBaseContext());
         }
     }
@@ -231,11 +209,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onTimeSet(TimePicker timePicker, int i, int i1) {
             MainActivity activity = (MainActivity) getActivity();
-            SharedPreferences.Editor editor = activity.
-                    getSharedPreferences(SHARED_PREFS_FILE_NAME, Context.MODE_PRIVATE).edit();
-            editor.putInt(SCHEDULE_HOUR_KEY, timePicker.getHour());
-            editor.putInt(SCHEDULE_MINUTE_KEY, timePicker.getMinute());
-            editor.apply();
+            CleanerSharedPreferences.ScheduledTime scheduledTime =
+                    new CleanerSharedPreferences.ScheduledTime();
+            scheduledTime.hour = timePicker.getHour();
+            scheduledTime.minute = timePicker.getMinute();
+            CleanerSharedPreferences.saveScheduleTime(activity.getBaseContext(), scheduledTime);
             activity.loadScheduleTime();
             activity.scheduleCleanup(timePicker.getHour(), timePicker.getMinute());
         }

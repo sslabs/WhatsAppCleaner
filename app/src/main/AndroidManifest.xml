@@ -23,6 +23,7 @@
         <receiver android:name=".CleanerReceiver" android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.sslabs.whatsappcleaner.ACTION_NOTIFICATION_DISMISSED" />
             </intent-filter>
         </receiver>
         <service android:name=".CleanerIntentService" />

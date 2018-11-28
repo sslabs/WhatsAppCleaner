@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Whatsapp Cleaner</string>
+    <string name="app_name">WhatsApp Cleaner</string>
     <string name="text_enable_clean">Apagar os back-ups do Whatsapp</string>
     <string name="text_not_scheduled_text">Ainda não agendado</string>
     <string name="text_schedule_time_text">Limpeza agendada para %1$02d:%2$02d</string>
@@ -9,7 +9,6 @@
     <string name="should_grant_storage_permission_dialog_message">Para funcionar corretamente, o Whatsapp Cleaner precisa acessar o armazenamento do dispositivo. Na próxima vez em que a aplicação requistar, você deve considerar permitir que a aplicação acesse o armazenamento, caso contrário os back-ups não serão apagados</string>
     <string name="channel_id">whatsapp_cleaner_channel_id</string>
     <string name="channel_name">Geral</string>
-    <string name="notification_cleanup_success_text">Whatsapp cleaner executado às %1$s</string>
     <string name="notification_cleanup_failed_unmounted">Falou ao limpar os backups: armazenamento não disponível</string>
     <string name="notification_cleanup_failed_delete">Alguns backups podem não ter sido apagados</string>
     <string name="notification_cleanup_failed_missing_permission">Você precisa dar permissão de acesso ao armazenamento para apagar os backups</string>

@@ -101,6 +101,7 @@ public enum Utils {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(text)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
                 .setSmallIcon(smallIconID);
         if (subText != null && subText.length() > 0) builder.setSubText(subText);
 

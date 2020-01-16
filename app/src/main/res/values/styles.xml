@@ -1,11 +1,24 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- Card appearance -->
+    <style name="Card"/>
+    <style name="Card.Text">
+        <item name="android:textColor">@color/cardTextColor</item>
+    </style>
+    <style name="Card.Text.Title" parent="Card.Text">
+        <item name="android:fontFamily">@font/work_sans_bold</item>
+        <item name="android:textSize">@dimen/card_title_text_size</item>
+    </style>
+    <style name="Card.Text.Body" parent="Card.Text">
+        <item name="android:fontFamily">@font/work_sans</item>
+        <item name="android:textSize">@dimen/card_body_text_size</item>
+    </style>
 </resources>

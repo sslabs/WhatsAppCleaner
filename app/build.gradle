@@ -1,8 +1,8 @@
-apply plugin: 'com.android.application'
+apply plugin: "com.android.application"
 
-apply plugin: 'kotlin-android'
+apply plugin: "kotlin-android"
 
-apply plugin: 'kotlin-android-extensions'
+apply plugin: "kotlin-android-extensions"
 
 android {
     compileSdkVersion 29
@@ -12,23 +12,35 @@ android {
         minSdkVersion 29
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.core:core-ktx:1.0.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    // Kotlin stuff
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // Android Jetpack libraries
+    implementation "androidx.appcompat:appcompat:$app_compat_version"
+    implementation "androidx.core:core-ktx:$jetpack_kotlin_core_version"
+    implementation "androidx.constraintlayout:constraintlayout:$constrain_layout_version"
+
+    // Material components
+    implementation "com.google.android.material:material:$material_version"
+
+    // Test
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation "junit:junit:$junit_version"
+    androidTestImplementation "androidx.test.ext:junit:$junit_jetpack_test_ext_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
 }

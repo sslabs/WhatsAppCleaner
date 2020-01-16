@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">WhatsApp Cleaner</string>
+
+    <!-- Card -->
+    <string name="schedule_card_tile_text">Daily cleaning</string>
+    <string name="schedule_card_off_body">Daily cleaning is off</string>
+    <string name="schedule_card_illustration_description">Schedule illustration</string>
+    <string name="schedule_card_action_text">Schedule</string>
 </resources>

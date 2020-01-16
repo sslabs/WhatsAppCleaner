@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Card -->
+    <dimen name="card_width">344dp</dimen>
+    <dimen name="card_margin">16dp</dimen>
+    <dimen name="card_title_margin">16dp</dimen>
+    <dimen name="card_illustration_side_size">80dp</dimen>
+    <dimen name="card_button_margin">8dp</dimen>
+    <dimen name="card_bottom_top_margin">8dp</dimen>
+    <dimen name="card_title_text_size">21sp</dimen>
+    <dimen name="card_body_text_size">17sp</dimen>
+</resources>

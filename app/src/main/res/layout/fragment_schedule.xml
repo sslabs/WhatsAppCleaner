@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.sslabs.whatsappcleaner.viewmodel.ScheduleViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/schedule_cleanup_switcher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/schedule_time_picker"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="Schedule daily cleanup" />
+
+        <TimePicker
+            android:id="@+id/schedule_time_picker"
+            android:layout_width="328dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/schedule_cleanup_switcher"
+            app:layout_constraintBottom_toTopOf="@id/schedule_time"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <TextView
+            android:id="@+id/schedule_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/schedule_time_picker"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/schedule_time_picker"
+            app:layout_constraintRight_toRightOf="@id/schedule_time_picker"
+            tools:text="WhatsApp databases cleaning is scheduled for 04:00"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

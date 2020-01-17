@@ -1,7 +1,7 @@
 package com.sslabs.whatsappcleaner.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.sslabs.whatsappcleaner.R
 
 class MainActivity : AppCompatActivity() {

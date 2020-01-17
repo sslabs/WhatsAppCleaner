@@ -7,9 +7,10 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
-    <include layout="@layout/schedule_card"
-        android:layout_height="wrap_content"
-        android:layout_width="344dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+    <fragment
+        android:id="@+id/home_fragment"
+        android:name="com.sslabs.whatsappcleaner.ui.HomeFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_home"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

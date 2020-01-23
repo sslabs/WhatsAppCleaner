@@ -2,11 +2,18 @@
     <string name="app_name">WhatsApp Cleaner</string>
 
     <!-- Card -->
-    <string name="schedule_card_tile_text">Daily cleaning</string>
-    <string name="schedule_card_off_body">Daily cleaning is off</string>
+    <string name="schedule_card_tile_text">Database cleaning</string>
+    <string name="schedule_card_off_body">Daily database cleaning is off</string>
     <string name="schedule_card_illustration_description">Schedule illustration</string>
     <string name="schedule_card_action_text">Schedule</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Bottom navigation -->
+    <string name="bottom_navigation_home_title">Home</string>
+    <string name="bottom_navigation_schedule_title">Schedule</string>
+
+    <!-- Schedule fragment -->
+    <string name="enable_scheduling_text">Schedule daily cleanup</string>
+    <string name="no_scheduling_time_text">Cleaning up of WhatsApp database backups is not scheduled</string>
+    <string name="scheduling_time_text">Daily cleaning of WhatsApp databases is scheduled for %1$s</string>
+    <string name="clock_image_description">Image shown when database cleaning up is disabled</string>
 </resources>

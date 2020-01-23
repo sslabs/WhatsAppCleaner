@@ -6,6 +6,8 @@ apply plugin: "kotlin-android-extensions"
 
 apply plugin: 'kotlin-kapt'
 
+apply plugin: 'androidx.navigation.safeargs'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -15,6 +17,7 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0.0"
+        vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -42,6 +45,13 @@ dependencies {
 
     // Material components
     implementation "com.google.android.material:material:$material_version"
+
+    // Navigation framework
+    implementation "androidx.navigation:navigation-fragment-ktx:$version_navigation"
+    implementation "androidx.navigation:navigation-ui-ktx:$version_navigation"
+
+    // Lifecycle extensions
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ext_version"
 
     // Test
     implementation 'androidx.appcompat:appcompat:1.1.0'

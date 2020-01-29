@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.sslabs.whatsappcleaner.R
 import com.sslabs.whatsappcleaner.databinding.FragmentScheduleBinding
 import com.sslabs.whatsappcleaner.viewmodel.ScheduleViewModel
@@ -26,7 +26,7 @@ class ScheduleFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_schedule, container, false)
         binding.lifecycleOwner = this
 
-        viewModel = ViewModelProviders.of(this).get(ScheduleViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(ScheduleViewModel::class.java)
         binding.scheduleViewModel = viewModel
 
         initViews()

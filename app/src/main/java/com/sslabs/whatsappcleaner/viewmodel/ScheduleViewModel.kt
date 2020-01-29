@@ -7,13 +7,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.sslabs.whatsappcleaner.R
 import com.sslabs.whatsappcleaner.repository.Repository
+import com.sslabs.whatsappcleaner.shortFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 class ScheduleViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -28,10 +27,8 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
     }
 
     val scheduleTimeMessage = Transformations.map(scheduling) {
-        val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
         scheduling.value?.let {
-            val time = scheduling.value!!.format(timeFormat)
-            application.getString(R.string.scheduling_time_text, time)
+            application.getString(R.string.scheduling_time_text, it.shortFormat())
         }
     }
 

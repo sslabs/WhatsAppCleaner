@@ -42,6 +42,7 @@ dependencies {
     implementation "androidx.core:core-ktx:$jetpack_kotlin_core_version"
     implementation "androidx.constraintlayout:constraintlayout:$constrain_layout_version"
     implementation "androidx.recyclerview:recyclerview:$recycler_view_version"
+    implementation "androidx.preference:preference-ktx:$preference_version"
 
     // Material components
     implementation "com.google.android.material:material:$material_version"
@@ -52,6 +53,10 @@ dependencies {
 
     // Lifecycle extensions
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ext_version"
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
 
     // Test
     implementation 'androidx.appcompat:appcompat:1.1.0'

@@ -41,14 +41,20 @@ class ScheduleFragment : Fragment() {
 
     private fun initSwitcher() {
         binding.scheduleCleanupSwitcher.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.enableScheduling(isChecked)
+            if (isChecked) {
+                viewModel.startScheduling(
+                    binding.scheduleTimePicker.hour,
+                    binding.scheduleTimePicker.minute)
+            } else {
+                viewModel.stopScheduling()
+            }
         }
     }
 
     private fun initTimePicker() {
         binding.scheduleTimePicker.setIs24HourView(DateFormat.is24HourFormat(context))
         binding.scheduleTimePicker.setOnTimeChangedListener { timePicker, _, _ ->
-            viewModel.setSchedulingTime(timePicker.hour, timePicker.minute)
+            viewModel.startScheduling(timePicker.hour, timePicker.minute)
         }
     }
 }

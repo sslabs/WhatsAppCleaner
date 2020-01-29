@@ -13,7 +13,6 @@
 
     <!-- Schedule fragment -->
     <string name="enable_scheduling_text">Schedule daily cleanup</string>
-    <string name="no_scheduling_time_text">Cleaning up of WhatsApp database backups is not scheduled</string>
     <string name="scheduling_time_text">Daily cleaning of WhatsApp databases is scheduled for %1$s</string>
     <string name="clock_image_description">Image shown when database cleaning up is disabled</string>
 </resources>

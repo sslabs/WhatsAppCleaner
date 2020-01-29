@@ -4,47 +4,56 @@ import android.app.Application
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.sslabs.whatsappcleaner.R
-import com.sslabs.whatsappcleaner.viewmodel.data.Scheduling
+import com.sslabs.whatsappcleaner.repository.Repository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 class ScheduleViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _scheduling = MutableLiveData<Scheduling?>()
-    val scheduling: LiveData<Scheduling?>
-        get() = _scheduling
+    val scheduling: LiveData<LocalTime?> = Repository.getScheduling(application.baseContext)
 
-    var timePickerVisible = Transformations.map(scheduling) {
-        if (it != null && it.enabled) View.VISIBLE else View.INVISIBLE
+    val timePickerVisible = Transformations.map(scheduling) {
+        if (it != null) View.VISIBLE else View.INVISIBLE
     }
 
-    var clockImageVisible = Transformations.map(timePickerVisible) {
+    val clockImageVisible = Transformations.map(timePickerVisible) {
         if (it == View.VISIBLE) View.GONE else View.VISIBLE
     }
 
-    var scheduleTimeMessage = Transformations.map(scheduling) {
+    val scheduleTimeMessage = Transformations.map(scheduling) {
         val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
-        val time = _scheduling.value!!.localTime.format(timeFormat)
-        application.getString(R.string.scheduling_time_text, time)
+        scheduling.value?.let {
+            val time = scheduling.value!!.format(timeFormat)
+            application.getString(R.string.scheduling_time_text, time)
+        }
     }
 
-    init {
-        loadScheduling()
+    private val viewModelJob = Job()
+
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
     }
 
-    fun enableScheduling(enable: Boolean) {
-        _scheduling.value = Scheduling(enable, LocalTime.now())
+    fun startScheduling(hour: Int, minute: Int) {
+        uiScope.launch {
+            val time = LocalTime.of(hour, minute)
+            Repository.saveScheduling(getApplication<Application>().baseContext, time)
+        }
     }
 
-    fun setSchedulingTime(hour: Int, minute: Int) {
-        _scheduling.value = Scheduling(_scheduling.value!!.enabled, LocalTime.of(hour, minute))
-    }
-
-    private fun loadScheduling() {
-        _scheduling.value = Scheduling(false, LocalTime.now())
+    fun stopScheduling() {
+        uiScope.launch {
+            Repository.deleteScheduling(getApplication<Application>().baseContext)
+        }
     }
 }

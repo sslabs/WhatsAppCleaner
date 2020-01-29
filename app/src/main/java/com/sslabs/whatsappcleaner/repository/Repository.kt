@@ -1,6 +1,7 @@
 package com.sslabs.whatsappcleaner.repository
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.sslabs.whatsappcleaner.combineWith
@@ -21,23 +22,23 @@ object Repository {
         }
     }
 
-    suspend fun saveScheduling(context: Context, scheduling: LocalTime) : Boolean {
+    suspend fun saveScheduling(context: Context, scheduling: LocalTime) {
         return withContext(Dispatchers.IO) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            sharedPreferences.edit()
-                .putInt(SCHEDULING_HOUR_PREFS_KEY, scheduling.hour)
-                .putInt(SCHEDULING_MINUTE_PREFS_KEY, scheduling.minute)
-                .commit()
+            sharedPreferences.edit {
+                putInt(SCHEDULING_HOUR_PREFS_KEY, scheduling.hour)
+                putInt(SCHEDULING_MINUTE_PREFS_KEY, scheduling.minute)
+            }
         }
     }
 
-    suspend fun deleteScheduling(context: Context) : Boolean {
+    suspend fun deleteScheduling(context: Context) {
         return withContext(Dispatchers.IO) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            sharedPreferences.edit()
-                .remove(SCHEDULING_HOUR_PREFS_KEY)
-                .remove(SCHEDULING_MINUTE_PREFS_KEY)
-                .commit()
+            sharedPreferences.edit {
+                remove(SCHEDULING_HOUR_PREFS_KEY)
+                remove(SCHEDULING_MINUTE_PREFS_KEY)
+            }
         }
     }
 }

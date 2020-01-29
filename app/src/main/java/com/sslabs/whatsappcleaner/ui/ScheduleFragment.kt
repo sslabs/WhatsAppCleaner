@@ -1,6 +1,5 @@
 package com.sslabs.whatsappcleaner.ui
 
-
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.LayoutInflater

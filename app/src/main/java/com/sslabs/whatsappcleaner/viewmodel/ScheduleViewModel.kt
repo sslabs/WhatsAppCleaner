@@ -5,16 +5,25 @@ import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.sslabs.whatsappcleaner.R
 import com.sslabs.whatsappcleaner.repository.Repository
 import com.sslabs.whatsappcleaner.shortFormat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import com.sslabs.whatsappcleaner.work.DeleteDatabasesWorker
+import com.sslabs.whatsappcleaner.work.DeleteDatabasesWorker.Companion.DELETE_WORK_NAME
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.time.Duration
 import java.time.LocalTime
+import java.util.concurrent.TimeUnit
 
 class ScheduleViewModel(application: Application) : AndroidViewModel(application) {
+
+    private var cleanupRequest: PeriodicWorkRequest?
 
     val scheduling: LiveData<LocalTime?> = Repository.getScheduling(application.baseContext)
 
@@ -32,25 +41,32 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    private val viewModelJob = Job()
-
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
+    init {
+        cleanupRequest = null
     }
 
     fun startScheduling(hour: Int, minute: Int) {
-        uiScope.launch {
+        viewModelScope.launch {
             val time = LocalTime.of(hour, minute)
             Repository.saveScheduling(getApplication<Application>().baseContext, time)
+            scheduleCleanup(time)
         }
     }
 
     fun stopScheduling() {
-        uiScope.launch {
+        viewModelScope.launch {
             Repository.deleteScheduling(getApplication<Application>().baseContext)
+        }
+    }
+
+    private fun scheduleCleanup(time: LocalTime) {
+        cleanupRequest = PeriodicWorkRequestBuilder<DeleteDatabasesWorker>(1, TimeUnit.DAYS)
+            .setInitialDelay(Duration.between(LocalTime.now(), time))
+            .build()
+        cleanupRequest?.let {
+            Timber.i("The next databases cleanup is scheduled to ${time.shortFormat()}")
+            WorkManager.getInstance(getApplication())
+                .enqueueUniquePeriodicWork(DELETE_WORK_NAME, ExistingPeriodicWorkPolicy.REPLACE, it)
         }
     }
 }

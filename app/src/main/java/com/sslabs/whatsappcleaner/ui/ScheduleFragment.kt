@@ -6,13 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.sslabs.whatsappcleaner.R
 import com.sslabs.whatsappcleaner.databinding.FragmentScheduleBinding
 import com.sslabs.whatsappcleaner.viewmodel.ScheduleViewModel
+import java.time.LocalTime
 
-class ScheduleFragment : Fragment() {
+class ScheduleFragment : PermissionManagedFragment() {
 
     private lateinit var binding: FragmentScheduleBinding
 
@@ -22,6 +22,7 @@ class ScheduleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_schedule, container, false)
         binding.lifecycleOwner = this
 
@@ -33,6 +34,14 @@ class ScheduleFragment : Fragment() {
         return binding.root
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        permissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     private fun initViews() {
         initSwitcher()
         initTimePicker()
@@ -41,9 +50,14 @@ class ScheduleFragment : Fragment() {
     private fun initSwitcher() {
         binding.scheduleCleanupSwitcher.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.startScheduling(
-                    binding.scheduleTimePicker.hour,
-                    binding.scheduleTimePicker.minute)
+                whenStorageAvailable({
+                    val now = LocalTime.now()
+                    // Starts with one hour ahead and give user some time to play with the time picker
+                    viewModel.startScheduling(now.hour + 1, now.minute)
+                }, {
+                    binding.scheduleCleanupSwitcher.isChecked = false
+                    defaultRequestStorageDenied()
+                })
             } else {
                 viewModel.stopScheduling()
             }

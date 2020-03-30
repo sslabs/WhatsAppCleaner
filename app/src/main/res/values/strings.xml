@@ -1,5 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [
+    <!ENTITY app_name "WhatsApp Cleaner">
+]>
+
 <resources>
-    <string name="app_name">WhatsApp Cleaner</string>
+    <string name="app_name">&app_name;</string>
 
     <!-- Card -->
     <string name="schedule_card_tile_text">Database cleaning</string>
@@ -17,4 +22,10 @@
     <string name="enable_scheduling_text">Schedule daily cleanup</string>
     <string name="scheduling_time_text">Daily cleaning of WhatsApp databases is scheduled for %1$s</string>
     <string name="clock_image_description">Image shown when database cleaning up is disabled</string>
+    
+    <!-- Permission managed fragment -->
+    <string name="storage_permission_denied_message">&app_name; needs you to give access to device storage prior to perform a cleanup</string>
+<!--    <string name="permission_denied_dialog_title">Permission denied</string>-->
+<!--    <string name="permission_denied_dialog_message">In order to use this feature, you need to %1$s</string>-->
+<!--    <string name="friendly_storage_permission_name">give access to device storage</string>-->
 </resources>

@@ -21,7 +21,7 @@ class SchedulingCard extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
               )),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               TextButton(onPressed: () {}, child: const Text('SCHEDULE')),
             ],

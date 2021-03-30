@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:whatsapp_cleaner/cards/scheduling_card.dart';
 
 class CardsPage extends StatelessWidget {
+
+  final List<Widget> cards;
+
+  CardsPage({@required this.cards});
+
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Padding(
-        padding: const EdgeInsets.only(top: 10.0),
-        child: SchedulingCard(),
-      )
-    ]);
+    return ListView(
+      padding: const EdgeInsets.only(top: 10.0),
+      children: cards,
+    );
   }
 }

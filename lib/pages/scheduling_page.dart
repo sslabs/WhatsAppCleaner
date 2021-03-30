@@ -56,7 +56,7 @@ class _SchedulingPageState extends State<SchedulingPage> {
                               children: [
                                 TextSpan(
                                     text:
-                                        'Daily cleaning of WhatsApp databases is scheduled for '),
+                                        'Daily cleaning of WhatsApp databases is scheduled to '),
                                 TextSpan(
                                     text:
                                         '${scheduleStore.scheduledTime.format(context)}',

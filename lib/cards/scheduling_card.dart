@@ -51,7 +51,7 @@ class _SchedulingCardState extends State<SchedulingCard> {
                                       'Daily database cleaning scheduled to '),
                               TextSpan(
                                   text:
-                                      '${scheduleStore.scheduledTime.format(context)}',
+                                      '${scheduleStore.scheduledTime.value.format(context)}',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: Colors.black87)),

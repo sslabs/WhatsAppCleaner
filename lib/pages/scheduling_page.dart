@@ -59,7 +59,7 @@ class _SchedulingPageState extends State<SchedulingPage> {
                                         'Daily cleaning of WhatsApp databases is scheduled to '),
                                 TextSpan(
                                     text:
-                                        '${scheduleStore.scheduledTime.format(context)}',
+                                        '${scheduleStore.scheduledTime.value.format(context)}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.w600)),
                                 TextSpan(text: '.')

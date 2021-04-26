@@ -67,7 +67,9 @@ class ScheduleFragment : PermissionManagedFragment() {
     private fun initTimePicker() {
         binding.scheduleTimePicker.setIs24HourView(DateFormat.is24HourFormat(context))
         binding.scheduleTimePicker.setOnTimeChangedListener { timePicker, _, _ ->
-            viewModel.startScheduling(timePicker.hour, timePicker.minute)
+            viewModel.scheduling.value?.let {
+                viewModel.startScheduling(timePicker.hour, timePicker.minute)
+            }
         }
     }
 }

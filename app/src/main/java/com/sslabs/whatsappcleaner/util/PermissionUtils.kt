@@ -13,14 +13,16 @@ import androidx.lifecycle.OnLifecycleEvent
 
 const val MAX_INT_16_BIT = 0b1111111111111111
 
-abstract class PermissionHandler(
+sealed class PermissionHandler(
     val onGranted: () -> Unit,
-    val onFailed: (failedPermissions: Array<String>) -> Unit) {
+    val onFailed: (failedPermissions: Array<String>) -> Unit
+) {
 
     abstract val permissions: Array<String>
 
     fun onPermissionResult(permissions: Array<String>, grantResults: IntArray) {
-        val denied = grantResults.indices.filter { grantResults[it] != PackageManager.PERMISSION_GRANTED }
+        val denied =
+            grantResults.indices.filter { grantResults[it] != PackageManager.PERMISSION_GRANTED }
         if (denied.isEmpty()) {
             onGranted()
         } else {
@@ -30,7 +32,7 @@ abstract class PermissionHandler(
 }
 
 class StoragePermissionHandler(
-    onGranted: () -> Unit ,
+    onGranted: () -> Unit,
     onFailed: (failedPermissions: Array<String>) -> Unit
 ) : PermissionHandler(onGranted, onFailed) {
 
@@ -47,20 +49,22 @@ class PermissionManager : FragmentLifecycleObserver {
     override fun initWith(owner: Fragment) {
         permissionRequester = { permissions, id -> owner.requestPermissions(permissions, id) }
         permissionChecker = {
-               val selfPermission = ContextCompat.checkSelfPermission(
-                   owner.requireContext(), it)
-               selfPermission == PackageManager.PERMISSION_GRANTED
+            val selfPermission = ContextCompat.checkSelfPermission(owner.requireContext(), it)
+            selfPermission == PackageManager.PERMISSION_GRANTED
         }
     }
 
     @Synchronized
-    fun onRequestPermissionsResult(requestCode: Int,
-                                                 permissions: Array<String>,
-                                                 grantResults: IntArray) {
+    fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         if (requestedPermissionHandlers.contains(requestCode)) {
             val permissionHandler = requestedPermissionHandlers.get(requestCode)
             requestedPermissionHandlers.remove(requestCode)
-            pendingResults[requestCode] = PermissionResult(permissionHandler, permissions, grantResults)
+            pendingResults[requestCode] =
+                PermissionResult(permissionHandler, permissions, grantResults)
         }
     }
 
@@ -77,7 +81,7 @@ class PermissionManager : FragmentLifecycleObserver {
         if (notGrantedPermissions.isEmpty()) {
             permissionHandler.onGranted()
         } else {
-            val id = this.genPermissionKey()
+            val id = genPermissionKey()
             requestedPermissionHandlers.put(id, permissionHandler)
             permissionRequester(notGrantedPermissions, id)
         }
@@ -86,7 +90,7 @@ class PermissionManager : FragmentLifecycleObserver {
     private fun genPermissionKey(maxTries: Int = 3): Int {
         if (maxTries < 0) throw RuntimeException("Could not generate sparse array key")
 
-        val random =  (1 until MAX_INT_16_BIT).random()
+        val random = (1 until MAX_INT_16_BIT).random()
         return if (requestedPermissionHandlers.contains(random)) {
             genPermissionKey(maxTries - 1) // Key collision
         } else {
@@ -94,11 +98,13 @@ class PermissionManager : FragmentLifecycleObserver {
         }
     }
 
-    private class PermissionResult internal constructor(
+    private class PermissionResult (
         private val permissionHandler: PermissionHandler,
         private val resultPermissions: Array<String>,
-        private val grantResults: IntArray) {
+        private val grantResults: IntArray
+    ) {
 
-        fun onPermissionResult() = permissionHandler.onPermissionResult(resultPermissions, grantResults)
+        fun onPermissionResult() =
+            permissionHandler.onPermissionResult(resultPermissions, grantResults)
     }
 }

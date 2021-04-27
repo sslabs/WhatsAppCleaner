@@ -10,5 +10,5 @@ interface FragmentLifecycleObserver : LifecycleObserver {
 
 fun Lifecycle.addObserver(observer: FragmentLifecycleObserver, fragment: Fragment) {
     observer.initWith(fragment)
-    addObserver(observer as LifecycleObserver)
+    addObserver(observer)
 }

@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import com.sslabs.whatsappcleaner.R
 import com.sslabs.whatsappcleaner.databinding.FragmentScheduleBinding
+import com.sslabs.whatsappcleaner.util.StoragePermissionHandler
 import com.sslabs.whatsappcleaner.viewmodel.ScheduleViewModel
 import java.time.LocalTime
 
@@ -21,7 +23,7 @@ class ScheduleFragment : PermissionManagedFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_schedule, container, false)
         binding.lifecycleOwner = this
@@ -34,14 +36,6 @@ class ScheduleFragment : PermissionManagedFragment() {
         return binding.root
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        permissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
     private fun initViews() {
         initSwitcher()
         initTimePicker()
@@ -50,14 +44,14 @@ class ScheduleFragment : PermissionManagedFragment() {
     private fun initSwitcher() {
         binding.scheduleCleanupSwitcher.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                whenStorageAvailable({
+                doWhenAllowed(StoragePermissionHandler({
                     val now = LocalTime.now()
                     // Starts with one hour ahead and give user some time to play with the time picker
                     viewModel.startScheduling(now.hour + 1, now.minute)
                 }, {
                     binding.scheduleCleanupSwitcher.isChecked = false
                     defaultRequestStorageDenied()
-                })
+                }))
             } else {
                 viewModel.stopScheduling()
             }
@@ -70,6 +64,14 @@ class ScheduleFragment : PermissionManagedFragment() {
             viewModel.scheduling.value?.let {
                 viewModel.startScheduling(timePicker.hour, timePicker.minute)
             }
+        }
+    }
+
+    private fun defaultRequestStorageDenied() {
+        view?.let {
+            Snackbar
+                .make(it, R.string.storage_permission_denied_message, Snackbar.LENGTH_LONG)
+                .show()
         }
     }
 }

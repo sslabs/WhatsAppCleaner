@@ -2,15 +2,13 @@ apply plugin: "com.android.application"
 
 apply plugin: "kotlin-android"
 
-apply plugin: "kotlin-android-extensions"
-
 apply plugin: 'kotlin-kapt'
 
 apply plugin: 'androidx.navigation.safeargs'
 
 android {
     compileSdkVersion versions.compileSdk
-    buildToolsVersion "29.0.2"
+    buildToolsVersion versions.buildToolsVersion
     defaultConfig {
         applicationId "com.sslabs.whatsappcleaner"
         minSdkVersion versions.minSdk
@@ -31,8 +29,8 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

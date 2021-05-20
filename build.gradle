@@ -20,6 +20,7 @@ buildscript {
     versions.lifecycle = "2.2.0"
     versions.work = "2.5.0"
     versions.timber = "4.7.1"
+    versions.koin = "3.0.2"
     versions.junit = "4.13"
     versions.junit_jetpack_test_ext = "1.1.2"
     versions.espresso = "3.3.0"

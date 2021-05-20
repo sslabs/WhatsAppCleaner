@@ -1,18 +1,16 @@
 package com.sslabs.whatsappcleaner.repository
 
-import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
-import androidx.preference.PreferenceManager
 import com.sslabs.whatsappcleaner.combineWith
 import com.sslabs.whatsappcleaner.getLiveInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalTime
 
-object Repository {
-    fun getScheduling(context: Context) : LiveData<LocalTime?> {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+class Repository(private val sharedPreferences: SharedPreferences) {
+    fun getScheduling() : LiveData<LocalTime?> {
         val hour = sharedPreferences.getLiveInt(SCHEDULING_HOUR_PREFS_KEY, INVALID_HOUR)
         val minute = sharedPreferences.getLiveInt(SCHEDULING_MINUTE_PREFS_KEY, INVALID_MINUTE)
         return hour.combineWith(minute) { h, m ->
@@ -22,9 +20,8 @@ object Repository {
         }
     }
 
-    suspend fun saveScheduling(context: Context, scheduling: LocalTime) {
+    suspend fun saveScheduling(scheduling: LocalTime) {
         return withContext(Dispatchers.IO) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
             sharedPreferences.edit {
                 putInt(SCHEDULING_HOUR_PREFS_KEY, scheduling.hour)
                 putInt(SCHEDULING_MINUTE_PREFS_KEY, scheduling.minute)
@@ -32,9 +29,8 @@ object Repository {
         }
     }
 
-    suspend fun deleteScheduling(context: Context) {
+    suspend fun deleteScheduling() {
         return withContext(Dispatchers.IO) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
             sharedPreferences.edit {
                 remove(SCHEDULING_HOUR_PREFS_KEY)
                 remove(SCHEDULING_MINUTE_PREFS_KEY)

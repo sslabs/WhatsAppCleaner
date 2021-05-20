@@ -75,6 +75,9 @@ dependencies {
     // Timber
     implementation "com.jakewharton.timber:timber:$versions.timber"
 
+    // Koin
+    implementation "io.insert-koin:koin-android:$versions.koin"
+
     // Test
     testImplementation "junit:junit:$versions.junit"
     androidTestImplementation "androidx.test.ext:junit:$versions.junit_jetpack_test_ext"

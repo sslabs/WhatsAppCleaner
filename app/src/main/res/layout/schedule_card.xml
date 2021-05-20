@@ -4,12 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="homeViewModel"
-            type="com.sslabs.whatsappcleaner.viewmodel.HomeViewModel" />
-    </data>
-
     <com.google.android.material.card.MaterialCardView
         android:layout_width="@dimen/card_width"
         android:layout_height="wrap_content">
@@ -36,7 +30,7 @@
                 android:id="@+id/schedule_card_body"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:text="@{homeViewModel.schedulingTimeText}"
+
                 app:layout_constraintBottom_toTopOf="@id/schedule_card_bottom_guideline"
                 app:layout_constraintLeft_toLeftOf="@id/schedule_card_title"
                 app:layout_constraintRight_toRightOf="@id/schedule_card_title"
@@ -69,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/card_button_margin"
-                android:text="@{homeViewModel.cardActionText}"
+
                 app:layout_constraintTop_toTopOf="@id/schedule_card_bottom_guideline"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"

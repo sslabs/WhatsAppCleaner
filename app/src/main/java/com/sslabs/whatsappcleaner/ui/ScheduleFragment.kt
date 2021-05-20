@@ -6,19 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.google.android.material.snackbar.Snackbar
 import com.sslabs.whatsappcleaner.R
 import com.sslabs.whatsappcleaner.databinding.FragmentScheduleBinding
+import com.sslabs.whatsappcleaner.shortFormat
 import com.sslabs.whatsappcleaner.util.StoragePermissionHandler
 import com.sslabs.whatsappcleaner.viewmodel.ScheduleViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalTime
 
 class ScheduleFragment : PermissionManagedFragment() {
 
     private lateinit var binding: FragmentScheduleBinding
 
-    private lateinit var viewModel: ScheduleViewModel
+    private val viewModel by viewModel<ScheduleViewModel>()
+
+    private lateinit var timePickerVisible: LiveData<Int>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,7 +33,6 @@ class ScheduleFragment : PermissionManagedFragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_schedule, container, false)
         binding.lifecycleOwner = this
 
-        viewModel = ViewModelProvider(this).get(ScheduleViewModel::class.java)
         binding.scheduleViewModel = viewModel
 
         initViews()
@@ -37,8 +41,25 @@ class ScheduleFragment : PermissionManagedFragment() {
     }
 
     private fun initViews() {
-        initSwitcher()
         initTimePicker()
+        initSwitcher()
+        initSchedulingOffViews()
+    }
+
+    private fun initSchedulingOffViews() {
+        Transformations.map(viewModel.scheduling) {
+            it?.let {
+                getString(R.string.scheduling_time_text, it.shortFormat())
+            }
+        }.observe(viewLifecycleOwner, {
+            binding.scheduleTimeText.text = it
+        })
+
+        Transformations.map(timePickerVisible) {
+            if (it == View.VISIBLE) View.GONE else View.VISIBLE
+        }.observe(viewLifecycleOwner, {
+            binding.scheduleImage.visibility = it
+        })
     }
 
     private fun initSwitcher() {
@@ -59,6 +80,14 @@ class ScheduleFragment : PermissionManagedFragment() {
     }
 
     private fun initTimePicker() {
+        timePickerVisible = Transformations.map(viewModel.scheduling) {
+            if (it != null) View.VISIBLE else View.INVISIBLE
+        }
+
+        timePickerVisible.observe(viewLifecycleOwner, {
+            binding.scheduleTimeContainer.visibility = it
+        })
+
         binding.scheduleTimePicker.setIs24HourView(DateFormat.is24HourFormat(context))
         binding.scheduleTimePicker.setOnTimeChangedListener { timePicker, _, _ ->
             viewModel.scheduling.value?.let {

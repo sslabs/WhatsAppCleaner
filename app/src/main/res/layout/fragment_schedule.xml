@@ -39,7 +39,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/schedule_image_margin_top"
             android:contentDescription="@string/clock_image_description"
-            android:visibility="@{scheduleViewModel.clockImageVisible}"
+
             app:layout_constraintTop_toBottomOf="@id/schedule_fragment_guideline_top"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -51,7 +51,7 @@
             android:id="@+id/schedule_time_container"
             android:layout_width="@dimen/time_picker_width"
             android:layout_height="0dp"
-            android:visibility="@{scheduleViewModel.timePickerVisible}"
+
             app:layout_constraintTop_toBottomOf="@id/schedule_fragment_guideline_top"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -74,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/time_text_margin_top"
-                android:text="@{scheduleViewModel.scheduleTimeMessage}"
+
                 app:layout_constraintTop_toBottomOf="@id/schedule_time_picker"
                 app:layout_constraintLeft_toLeftOf="@id/schedule_time_picker"
                 app:layout_constraintRight_toRightOf="@id/schedule_time_picker"

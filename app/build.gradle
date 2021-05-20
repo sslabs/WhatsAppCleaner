@@ -77,6 +77,7 @@ dependencies {
 
     // Koin
     implementation "io.insert-koin:koin-android:$versions.koin"
+    implementation "io.insert-koin:koin-androidx-workmanager:$versions.koin"
 
     // Test
     testImplementation "junit:junit:$versions.junit"

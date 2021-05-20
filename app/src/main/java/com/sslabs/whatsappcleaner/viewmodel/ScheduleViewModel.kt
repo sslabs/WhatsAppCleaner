@@ -1,20 +1,25 @@
 package com.sslabs.whatsappcleaner.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.sslabs.whatsappcleaner.repository.Repository
 import com.sslabs.whatsappcleaner.shortFormat
 import com.sslabs.whatsappcleaner.work.DeleteDatabasesWorker
+import com.sslabs.whatsappcleaner.work.DeleteDatabasesWorker.Companion.DELETE_WORK_NAME
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.Duration
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 
-class ScheduleViewModel(private val repository: Repository) : ViewModel() {
+class ScheduleViewModel(private val repository: Repository, private val app: Application) :
+    ViewModel() {
 
     private var cleanupRequest: PeriodicWorkRequest?
 
@@ -44,8 +49,8 @@ class ScheduleViewModel(private val repository: Repository) : ViewModel() {
             .build()
         cleanupRequest?.let {
             Timber.i("The next databases cleanup is scheduled to ${time.shortFormat()}")
-//            WorkManager.getInstance(context)
-//                .enqueueUniquePeriodicWork(DELETE_WORK_NAME, ExistingPeriodicWorkPolicy.REPLACE, it)
+            WorkManager.getInstance(app.applicationContext)
+                .enqueueUniquePeriodicWork(DELETE_WORK_NAME, ExistingPeriodicWorkPolicy.REPLACE, it)
         }
     }
 }
